@@ -1,5 +1,6 @@
 pub mod models;
 pub mod parser;
+pub mod stats;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
