@@ -77,101 +77,85 @@
   }
 </script>
 
-<div class="packet-list" bind:this={containerEl} onscroll={onScroll}>
-  <div class="virtual-spacer" style="height: {totalHeight}px">
-    <table>
-      <thead>
-        <tr>
-          <th class="col-id">#</th>
-          <th class="col-time">Time</th>
-          <th class="col-src">Source</th>
-          <th class="col-dst">Destination</th>
-          <th class="col-proto">Protocol</th>
-          <th class="col-len">Length</th>
-          <th class="col-info">Info</th>
-        </tr>
-      </thead>
-      <tbody style="transform: translateY({startIndex * ROW_HEIGHT}px)">
+<div class="packet-list-wrapper">
+  <div class="header-row">
+    <span class="col-id">#</span>
+    <span class="col-time">Time</span>
+    <span class="col-src">Source</span>
+    <span class="col-dst">Destination</span>
+    <span class="col-proto">Protocol</span>
+    <span class="col-len">Length</span>
+    <span class="col-info">Info</span>
+  </div>
+  <div class="scroll-container" bind:this={containerEl} onscroll={onScroll}>
+    <div class="virtual-spacer" style="height: {totalHeight}px">
+      <div class="visible-rows" style="transform: translateY({startIndex * ROW_HEIGHT}px)">
         {#each visiblePackets as pkt (pkt.id)}
-          <tr
+          <div
             class="packet-row"
             class:selected={$selectedPacket?.id === pkt.id}
             onclick={() => selectPacket(pkt)}
             style="height: {ROW_HEIGHT}px"
           >
-            <td class="col-id">{pkt.id}</td>
-            <td class="col-time">{formatTime(pkt.timestamp)}</td>
-            <td class="col-src">{pkt.src_ip}{pkt.src_port != null ? ':' + pkt.src_port : ''}</td>
-            <td class="col-dst">{pkt.dst_ip}{pkt.dst_port != null ? ':' + pkt.dst_port : ''}</td>
-            <td class="col-proto">
-              <span class="proto-badge" style="color: {getProtocolColor(pkt.protocol)}">
-                {getProtocolName(pkt.protocol)}
-              </span>
-            </td>
-            <td class="col-len">{pkt.length}</td>
-            <td class="col-info">{pkt.summary}</td>
-          </tr>
+            <span class="col-id">{pkt.id}</span>
+            <span class="col-time">{formatTime(pkt.timestamp)}</span>
+            <span class="col-src">{pkt.src_ip}{pkt.src_port != null ? ':' + pkt.src_port : ''}</span>
+            <span class="col-dst">{pkt.dst_ip}{pkt.dst_port != null ? ':' + pkt.dst_port : ''}</span>
+            <span class="col-proto" style="color: {getProtocolColor(pkt.protocol)}">
+              {getProtocolName(pkt.protocol)}
+            </span>
+            <span class="col-len">{pkt.length}</span>
+            <span class="col-info">{pkt.summary}</span>
+          </div>
         {/each}
-      </tbody>
-    </table>
+      </div>
+    </div>
   </div>
 </div>
 
 <style>
-  .packet-list {
-    overflow-y: auto;
+  .packet-list-wrapper {
+    display: flex;
+    flex-direction: column;
     height: 100%;
     font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
     font-size: 12px;
     color: #e0e0e0;
   }
 
-  .virtual-spacer {
-    position: relative;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-  }
-
-  thead {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-
-  th {
+  .header-row {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 8px;
     background: #1a1a2e;
     border-bottom: 1px solid #2a2a4a;
-    padding: 4px 8px;
-    text-align: left;
     font-weight: 600;
     font-size: 11px;
     color: #888;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    white-space: nowrap;
-    height: 28px;
+    flex-shrink: 0;
   }
 
-  td {
-    padding: 0 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .scroll-container {
+    flex: 1;
+    overflow-y: auto;
   }
 
-  .col-id { width: 60px; }
-  .col-time { width: 110px; }
-  .col-src { width: 160px; }
-  .col-dst { width: 160px; }
-  .col-proto { width: 80px; }
-  .col-len { width: 70px; text-align: right; }
-  .col-info { width: auto; }
+  .virtual-spacer {
+    position: relative;
+  }
+
+  .visible-rows {
+    position: absolute;
+    width: 100%;
+  }
 
   .packet-row {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
     cursor: pointer;
     border-bottom: 1px solid #1a1a2e;
   }
@@ -185,7 +169,11 @@
     outline: 1px solid #00d4ff40;
   }
 
-  .proto-badge {
-    font-weight: 600;
-  }
+  .col-id { width: 60px; flex-shrink: 0; }
+  .col-time { width: 110px; flex-shrink: 0; }
+  .col-src { width: 160px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .col-dst { width: 160px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .col-proto { width: 80px; flex-shrink: 0; font-weight: 600; }
+  .col-len { width: 70px; flex-shrink: 0; text-align: right; }
+  .col-info { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #aaa; }
 </style>
