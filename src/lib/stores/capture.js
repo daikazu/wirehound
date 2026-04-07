@@ -11,3 +11,7 @@ export const isCapturing = writable(false);
 export const hasPermission = writable(null);
 
 export const displayFilter = writable('');
+export const resolveDns = writable(false);
+
+/** @type {import('svelte/store').Writable<Record<string, string>>} */
+export const resolvedHosts = writable({});

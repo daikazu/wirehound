@@ -1,5 +1,7 @@
 use crate::capture::{self, CaptureState};
 use crate::models::NetworkInterface;
+use crate::resolver;
+use std::sync::atomic::Ordering;
 use std::sync::Arc;
 use tauri::{AppHandle, State};
 
@@ -31,5 +33,20 @@ pub fn stop_capture(state: State<'_, Arc<CaptureState>>) -> Result<(), String> {
 
 #[tauri::command]
 pub fn is_capturing(state: State<'_, Arc<CaptureState>>) -> bool {
-    state.is_capturing.load(std::sync::atomic::Ordering::Relaxed)
+    state.is_capturing.load(Ordering::Relaxed)
+}
+
+#[tauri::command]
+pub fn set_resolve_dns(
+    app: AppHandle,
+    state: State<'_, Arc<CaptureState>>,
+    enabled: bool,
+) -> Result<(), String> {
+    state.resolver.enabled.store(enabled, Ordering::Relaxed);
+    if enabled {
+        // Start resolver thread (idempotent — it loops forever once started,
+        // but only does work when enabled is true)
+        resolver::start_resolver_thread(app, Arc::clone(&state.resolver));
+    }
+    Ok(())
 }

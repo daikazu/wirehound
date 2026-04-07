@@ -3,7 +3,7 @@
   import { listen } from '@tauri-apps/api/event';
   import { packets, selectedPacket } from '$lib/stores/packets.js';
   import { stats, bandwidthHistory } from '$lib/stores/stats.js';
-  import { hasPermission, isCapturing } from '$lib/stores/capture.js';
+  import { hasPermission, isCapturing, resolvedHosts } from '$lib/stores/capture.js';
 
   import PermissionCheck from '$lib/components/PermissionCheck.svelte';
   import Toolbar from '$lib/components/Toolbar.svelte';
@@ -30,6 +30,11 @@
     listen('stats', (event) => {
       stats.set(event.payload);
       bandwidthHistory.push(event.payload.bytes_per_sec);
+    }).then(u => unlisteners.push(u));
+
+    listen('dns-resolved', (event) => {
+      const { ip, hostname } = event.payload;
+      resolvedHosts.update(h => ({ ...h, [ip]: hostname }));
     }).then(u => unlisteners.push(u));
 
     listen('capture-error', (event) => {

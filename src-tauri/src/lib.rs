@@ -2,6 +2,7 @@ pub mod capture;
 pub mod commands;
 pub mod models;
 pub mod parser;
+pub mod resolver;
 pub mod stats;
 
 use capture::CaptureState;
@@ -18,6 +19,7 @@ pub fn run() {
             commands::start_capture,
             commands::stop_capture,
             commands::is_capturing,
+            commands::set_resolve_dns,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

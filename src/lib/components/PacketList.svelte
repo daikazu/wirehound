@@ -1,6 +1,6 @@
 <script>
   import { packets, selectedPacket } from '$lib/stores/packets.js';
-  import { displayFilter } from '$lib/stores/capture.js';
+  import { displayFilter, resolveDns, resolvedHosts } from '$lib/stores/capture.js';
 
   const ROW_HEIGHT = 28;
 
@@ -72,6 +72,17 @@
     }
   }
 
+  function formatAddr(ip, port) {
+    let display = ip;
+    if ($resolveDns && $resolvedHosts[ip]) {
+      display = $resolvedHosts[ip];
+    }
+    if (port != null) {
+      display += ':' + port;
+    }
+    return display;
+  }
+
   function selectPacket(packet) {
     selectedPacket.set(packet);
   }
@@ -99,8 +110,8 @@
           >
             <span class="col-id">{pkt.id}</span>
             <span class="col-time">{formatTime(pkt.timestamp)}</span>
-            <span class="col-src">{pkt.src_ip}{pkt.src_port != null ? ':' + pkt.src_port : ''}</span>
-            <span class="col-dst">{pkt.dst_ip}{pkt.dst_port != null ? ':' + pkt.dst_port : ''}</span>
+            <span class="col-src" title={pkt.src_ip}>{formatAddr(pkt.src_ip, pkt.src_port)}</span>
+            <span class="col-dst" title={pkt.dst_ip}>{formatAddr(pkt.dst_ip, pkt.dst_port)}</span>
             <span class="col-proto" style="color: {getProtocolColor(pkt.protocol)}">
               {getProtocolName(pkt.protocol)}
             </span>

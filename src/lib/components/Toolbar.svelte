@@ -1,6 +1,6 @@
 <script>
   import { invoke } from '@tauri-apps/api/core';
-  import { interfaces, selectedInterface, bpfFilter, isCapturing, displayFilter } from '$lib/stores/capture.js';
+  import { interfaces, selectedInterface, bpfFilter, isCapturing, displayFilter, resolveDns } from '$lib/stores/capture.js';
   import { packets } from '$lib/stores/packets.js';
   import { bandwidthHistory, stats } from '$lib/stores/stats.js';
   import { selectedPacket } from '$lib/stores/packets.js';
@@ -45,6 +45,14 @@
       } catch (e) {
         error = String(e);
       }
+    }
+  }
+
+  async function toggleDns() {
+    try {
+      await invoke('set_resolve_dns', { enabled: $resolveDns });
+    } catch (e) {
+      error = String(e);
     }
   }
 
@@ -102,6 +110,15 @@
   </div>
 
   <div class="toolbar-actions">
+    <label class="dns-toggle" title="Resolve IP addresses to hostnames via reverse DNS">
+      <input
+        type="checkbox"
+        bind:checked={$resolveDns}
+        onchange={toggleDns}
+      />
+      <span class="dns-label">DNS</span>
+    </label>
+
     <button
       class="btn-capture"
       class:capturing={$isCapturing}
@@ -221,6 +238,26 @@
   .btn-clear:hover:not(:disabled) {
     border-color: #666;
     color: #e0e0e0;
+  }
+
+  .dns-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .dns-toggle input {
+    accent-color: #00d4ff;
+    cursor: pointer;
+  }
+
+  .dns-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .packet-count {

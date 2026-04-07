@@ -1,5 +1,6 @@
 use crate::models::NetworkInterface;
 use crate::parser;
+use crate::resolver::ResolverState;
 use crate::stats::StatsAggregator;
 use pcap::{Capture, Device};
 use std::sync::{
@@ -12,6 +13,7 @@ pub struct CaptureState {
     pub is_capturing: AtomicBool,
     pub packets_dropped: AtomicU64,
     pub stats_aggregator: Mutex<StatsAggregator>,
+    pub resolver: Arc<ResolverState>,
 }
 
 impl CaptureState {
@@ -20,6 +22,7 @@ impl CaptureState {
             is_capturing: AtomicBool::new(false),
             packets_dropped: AtomicU64::new(0),
             stats_aggregator: Mutex::new(StatsAggregator::new()),
+            resolver: Arc::new(ResolverState::new()),
         }
     }
 }
@@ -96,6 +99,9 @@ pub fn start_capture(
                         if let Ok(mut agg) = capture_state.stats_aggregator.lock() {
                             agg.record_packet(&parsed);
                         }
+                        // Queue IPs for DNS resolution
+                        capture_state.resolver.queue_ip(&parsed.src_ip);
+                        capture_state.resolver.queue_ip(&parsed.dst_ip);
                         let _ = app_clone.emit("packet", &parsed);
                     }
                 }
