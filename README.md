@@ -1,6 +1,8 @@
 # Wirehound
 
-A network traffic sniffer desktop app built with Tauri, Rust, and Svelte. This is an experimental/learning project for exploring Rust and low-level packet capture — it's not intended for release or production use.
+> **Note:** This is an experimental/learning project for exploring Rust and low-level packet capture — it's not intended for release or production use.
+
+A network traffic sniffer desktop app built with Tauri, Rust, and Svelte.
 
 ## What it does
 
@@ -21,7 +23,7 @@ A network traffic sniffer desktop app built with Tauri, Rust, and Svelte. This i
 
 ## Running
 
-Requires Rust, Node.js, and libpcap (ships with macOS).
+Requires Rust, Node.js, and libpcap.
 
 ```bash
 npm install
@@ -41,7 +43,3 @@ npm run tauri build
 ```
 
 Produces a `.app` bundle and `.dmg` installer in `src-tauri/target/release/bundle/`.
-
-## Status
-
-Experimental. Built as a learning exercise for Rust and systems programming. Not planned for release.
