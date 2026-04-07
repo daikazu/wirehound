@@ -7,7 +7,6 @@ use std::sync::{
     Arc, Mutex,
 };
 use tauri::{AppHandle, Emitter};
-use tokio::time::{interval, Duration};
 
 pub struct CaptureState {
     pub is_capturing: AtomicBool,
@@ -115,10 +114,9 @@ pub fn start_capture(
     // Stats emission thread (every 1 second)
     let stats_state = Arc::clone(&state);
     let stats_app = app.clone();
-    tokio::spawn(async move {
-        let mut tick = interval(Duration::from_secs(1));
+    std::thread::spawn(move || {
         while stats_state.is_capturing.load(Ordering::Relaxed) {
-            tick.tick().await;
+            std::thread::sleep(std::time::Duration::from_secs(1));
             if let Ok(mut agg) = stats_state.stats_aggregator.lock() {
                 let stats = agg.tick();
                 let _ = stats_app.emit("stats", &stats);
